@@ -29,7 +29,7 @@ scikit-learn = "^1.1.1"
 scipy = "^1.8.1"
 seaborn = "^0.11.2"
 tensorboard = "^2.9.0"
-tensorflow-io-gcs-filesystem = { version = "*", source = "pypi" }
+tensorflow-io-gcs-filesystem = "*"
 torch = "^1.12.0"
 functorch = "^0.2.1"
 tqdm = "^4.64.0"
