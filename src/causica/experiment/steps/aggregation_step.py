@@ -129,7 +129,7 @@ def _get_summary_dict_from_dataframe(df: pd.DataFrame) -> dict:
     Given a dataframe with flattened keys as column headings, create a nested dict with
     {'mean': .., 'std': ..', 'num_samples': ...} at bottom level.
     """
-    mean_df = df.mean()
+    mean_df = df.mean(numeric_only=True)
     # Use biased std estimator, to match numpy default behaviour
     std_df = df.std(ddof=0)
     count_df = df.count()
