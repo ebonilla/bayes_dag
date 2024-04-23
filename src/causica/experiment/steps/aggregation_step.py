@@ -132,7 +132,7 @@ def _get_summary_dict_from_dataframe(df: pd.DataFrame) -> dict:
     mean_df = df.mean(numeric_only=True)
     # Use biased std estimator, to match numpy default behaviour
     std_df = df.std(ddof=0, numeric_only=True)
-    count_df = df.count(numeric_only=True)
+    count_df = df.count()
     mean, std, count = [mean_df.to_dict(), std_df.to_dict(), count_df.to_dict()]
     return unflatten_keys({k: {"mean": mean[k], "std": std[k], "num_samples": count[k]} for k in mean})
 
@@ -146,7 +146,7 @@ def _get_summary_dicts_from_groupby(grouped_df) -> Dict[Any, Dict]:
     mean_df = grouped_df.mean(numeric_only=True)
     # Use biased std estimator, to match numpy default behaviour
     std_df = grouped_df.std(ddof=0, numeric_only=True)
-    count_df = grouped_df.count(numeric_only=True)
+    count_df = grouped_df.count()
     mean, std, count = [mean_df.to_dict(), std_df.to_dict(), count_df.to_dict()]
     index = mean_df.index
     mean, std, count = [{i: {k: v[i] for k, v in d.items()} for i in index} for d in (mean, std, count)]
