@@ -143,10 +143,10 @@ def _get_summary_dicts_from_groupby(grouped_df) -> Dict[Any, Dict]:
     Keys of the returned dict_of_summaries are the values the dataframe was grouped by,
     and the values are like the dicts you get from _get_summary_dict_from_dataframe.
     """
-    mean_df = grouped_df.mean()
+    mean_df = grouped_df.mean(numeric_only=True)
     # Use biased std estimator, to match numpy default behaviour
-    std_df = grouped_df.std(ddof=0)
-    count_df = grouped_df.count()
+    std_df = grouped_df.std(ddof=0, numeric_only=True)
+    count_df = grouped_df.count(numeric_only=True)
     mean, std, count = [mean_df.to_dict(), std_df.to_dict(), count_df.to_dict()]
     index = mean_df.index
     mean, std, count = [{i: {k: v[i] for k, v in d.items()} for i in index} for d in (mean, std, count)]
