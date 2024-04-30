@@ -446,6 +446,12 @@ class BayesDAGNonLinear(BayesDAG):
                 best_loss = loss_epoch.item()
                 print("New best model found. Saving Checkpoint")
                 prev_best = 0
+
+                # EVB: Saving adjacencies here
+                adj_matrix, is_dag = self.get_adj_matrix(samples=100)
+                torch.save(obj=adj_matrix,
+                           f=self.save_dir + '/' + 'bayesdag' + '_dags' + '.pt')
+
                 self.save(best=True)
             else:
                 prev_best +=1
