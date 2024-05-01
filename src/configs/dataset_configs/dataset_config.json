@@ -3,6 +3,6 @@
     "use_predefined_dataset": false,
     "test_fraction": 0.1,
     "val_fraction": 0.1,
-    "random_seed": [0],
+    "random_seed": [0,0],
     "negative_sample": false
 }
