@@ -68,11 +68,14 @@ class BaseDataset:
         self._held_out_interventions = held_out_interventions
         self._true_posterior = true_posterior
         self._graph_args = graph_args
-        self._num_nodes = graph_args['num_variables']
-        self._num_edges_expectation = graph_args['exp_edges']
-        self._exp_edges_per_node = graph_args['exp_edges_per_node']
-        self._graph_type = graph_args['graph_type']
-        self._seed = graph_args['seed']
+
+        # EVB
+        if graph_args is not None:
+            self._num_nodes = graph_args['num_variables']
+            self._num_edges_expectation = graph_args['exp_edges']
+            self._exp_edges_per_node = graph_args['exp_edges_per_node']
+            self._graph_type = graph_args['graph_type']
+            self._seed = graph_args['seed']
 
     def save_data_split(self, save_dir: str) -> None:
         """
