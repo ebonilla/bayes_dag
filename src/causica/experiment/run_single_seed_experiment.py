@@ -144,7 +144,10 @@ def run_single_seed_experiment(args: ExperimentArguments):
         running_times["train/running-time"] = (time.time() - start_time) / 60
     save_json(args.dataset_config, os.path.join(model.save_dir, "dataset_config.json"))
     save_txt(args.dataset_name, os.path.join(model.save_dir, "dataset_name.txt"))
-    eval_causal_discovery(dataset, model)
+    try: # Added by EVB
+        eval_causal_discovery(dataset, model)
+    except:
+        print("ignoring model evaluation")
     try:
         model.load_state_dict(torch.load(os.path.join(model.save_dir, model.best_model_file)))
         eval_causal_discovery(dataset, model, best = True)
