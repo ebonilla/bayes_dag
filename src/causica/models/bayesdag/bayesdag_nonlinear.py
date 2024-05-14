@@ -449,6 +449,8 @@ class BayesDAGNonLinear(BayesDAG):
 
                 # EVB: Saving adjacencies here
                 adj_matrix, is_dag = self.get_adj_matrix(samples=100)
+                num_edges = adj_matrix.sum((1, 2)).mean()
+                print("Number of edges = " + str(num_edges))
                 torch.save(obj=adj_matrix,
                            f=self.save_dir + '/' + 'bayesdag' + '_dags' + '.pt')
 
