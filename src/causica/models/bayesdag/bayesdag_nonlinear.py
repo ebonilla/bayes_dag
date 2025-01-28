@@ -457,7 +457,7 @@ class BayesDAGNonLinear(BayesDAG):
             end_time = time.perf_counter()
             end_memory = psutil.virtual_memory().used
             exec_time = end_time - start_time
-            results_time.append(("VDESP", self.d, n_perm_samples_train, n_dag_samples_train, exec_time,
+            results_time.append(("VDESP", self.num_nodes, n_perm_samples_train, n_dag_samples_train, exec_time,
                                  self.start_memory / (1024**2), end_memory/ (1024**2)))
 
             tracker_loss_terms["loss"].append(loss.mean().item())
