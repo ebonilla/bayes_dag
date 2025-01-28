@@ -24,6 +24,10 @@ from functools import partial
 from scipy.optimize import linear_sum_assignment
 
 
+# For benchmarking time, memory
+import os, psutil, time, pandas as pd
+
+
 class BayesDAGNonLinear(BayesDAG):
     """
     Approximate Bayesian inference over the graph in a Gaussian nonlinear ANM based on the BayesDAG result. Any DAG G is represented as G = W * Step(grad (p))
@@ -67,6 +71,8 @@ class BayesDAGNonLinear(BayesDAG):
             input_perm: Whether to use the input permutation to generate the adjacency matrix
             VI_norm: Whether to use layer norm in the helper network
         """
+        self.start_memory = psutil.virtual_memory().used
+
         super().__init__(
             model_id=model_id,
             variables=variables,
@@ -427,7 +433,16 @@ class BayesDAGNonLinear(BayesDAG):
         # Outer optimization loop
         inner_opt_count = 0
         prev_best = 0
+
+        # EVB Profiling code
+        results_time = []
+        csv_file = "benchmark_results.csv"
+
         for step in range(train_config_dict["max_epochs"]):
+
+            # EVB profiling code
+            start_time = time.perf_counter()
+
             loss_epoch = 0.
             
             for (x, _) in dataloader:
@@ -437,6 +452,14 @@ class BayesDAGNonLinear(BayesDAG):
                 weights_loss = self._posterior_weights_sample(data=x, dataset_size=self.dataset_size ,num_samples=1)
                 loss = (p_loss+W_loss+weights_loss)/3
                 loss_epoch += loss
+
+            # EVB Profiling code
+            end_time = time.perf_counter()
+            end_memory = psutil.virtual_memory().used
+            exec_time = end_time - start_time
+            results_time.append(("VDESP", self.d, n_perm_samples_train, n_dag_samples_train, exec_time,
+                                 self.start_memory / (1024**2), end_memory/ (1024**2)))
+
             tracker_loss_terms["loss"].append(loss.mean().item())
             tracker_loss_terms["p_loss"].append(p_loss.item())
             tracker_loss_terms["W_loss"].append(W_loss.item())
@@ -470,6 +493,20 @@ class BayesDAGNonLinear(BayesDAG):
                 self.print_tracker_sgld(step, tracker_loss_terms, adj_metrics)
                 
             _log_epoch_metrics(writer=writer, tracker_loss_terms=tracker_loss_terms, adj_metrics=adj_metrics, step=step)
+
+        # EVB profiling code: Saving benchmarking results
+        df = pd.DataFrame(results_time, columns=["Method",
+                                                 "Nodes",
+                                                 "Perm Samples",
+                                                 "Dag Samples",
+                                                 "Execution Time (s)",
+                                                 "Start Memory (MB)",
+                                                 "End Memory (MB)"])
+        if os.path.exists(csv_file):
+            df.to_csv(csv_file, mode='a', header=False, index=False)
+        else:
+            df.to_csv(csv_file, mode='w', header=True, index=False)
+        ##
 
                 
     def print_tracker_sgld(self, step: int, tracker: dict, adj_metrics: Optional[dict]) -> None:
