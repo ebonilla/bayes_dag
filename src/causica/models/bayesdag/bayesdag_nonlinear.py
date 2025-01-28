@@ -7,7 +7,10 @@ from typing import Any, Callable, Dict, Optional, Tuple
 import numpy as np
 import torch
 from functorch import vmap
-from functorch._src.make_functional import transpose_stack
+# EVB
+# from functorch._src.make_functional import transpose_stack
+from torch._functorch.make_functional import transpose_stack
+
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 
@@ -27,6 +30,11 @@ from scipy.optimize import linear_sum_assignment
 # For benchmarking time, memory
 import os, psutil, time, pandas as pd
 
+
+# EVB: To deal with too many open files by tensorboard
+import resource
+soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+resource.setrlimit(resource.RLIMIT_NOFILE, (65536, hard_limit))
 
 class BayesDAGNonLinear(BayesDAG):
     """
@@ -457,7 +465,7 @@ class BayesDAGNonLinear(BayesDAG):
             end_time = time.perf_counter()
             end_memory = psutil.virtual_memory().used
             exec_time = end_time - start_time
-            results_time.append(("VDESP", self.num_nodes, n_perm_samples_train, n_dag_samples_train, exec_time,
+            results_time.append(("VDESP", self.num_nodes, -1, -1, exec_time,
                                  self.start_memory / (1024**2), end_memory/ (1024**2)))
 
             tracker_loss_terms["loss"].append(loss.mean().item())
@@ -507,6 +515,8 @@ class BayesDAGNonLinear(BayesDAG):
         else:
             df.to_csv(csv_file, mode='w', header=True, index=False)
         ##
+
+        writer.close()
 
                 
     def print_tracker_sgld(self, step: int, tracker: dict, adj_metrics: Optional[dict]) -> None:

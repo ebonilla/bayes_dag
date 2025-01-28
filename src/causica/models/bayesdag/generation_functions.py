@@ -3,7 +3,11 @@ from typing import Dict, List, Optional, Tuple, Type
 
 import torch
 from functorch import FunctionalModuleWithBuffers
-from functorch._src.make_functional import _swap_state, extract_weights, transpose_stack, extract_buffers
+
+# EVB
+# from functorch._src.make_functional import _swap_state, extract_weights, transpose_stack, extract_buffers
+from torch._functorch.make_functional import _swap_state, extract_weights, transpose_stack, extract_buffers
+
 from torch import nn
 
 from ...utils.torch_utils import generate_fully_connected
